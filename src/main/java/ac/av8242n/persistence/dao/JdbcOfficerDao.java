@@ -32,17 +32,13 @@ public class JdbcOfficerDao implements OfficerDao {
     @Override
     public Optional<Officer> findById(Integer id) {
         if (!existsById(id)) return Optional.empty();
+        // Java 7 anonymous inner class
         return Optional.of(jdbcTemplate.queryForObject(
                 "SELECT * FROM officers WHERE id=?",
-                new RowMapper<Officer>() {  // Java 7 anonymous inner class
-                    @Override
-                    public Officer mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        return new Officer(rs.getInt("id"),
-                                Rank.valueOf(rs.getString("rank")),
-                                rs.getString("first_name"),
-                                rs.getString("last_name"));
-                    }
-                },
+                (rs, rowNum) -> new Officer(rs.getInt("id"),
+                        Rank.valueOf(rs.getString("rank")),
+                        rs.getString("first_name"),
+                        rs.getString("last_name")),
                 id));
     }
 
